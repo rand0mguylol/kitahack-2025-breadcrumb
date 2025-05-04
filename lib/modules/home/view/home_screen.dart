@@ -1,5 +1,6 @@
 import 'package:breadcrumbs/modules/home/view_model/home_view_model.dart';
 import 'package:breadcrumbs/modules/home/widget/home_calorie_card.dart';
+import 'package:breadcrumbs/repository/mascot/user_mascot_repository.dart';
 import 'package:breadcrumbs/router/routes.dart';
 import 'package:breadcrumbs/widgets/app_bar/custom_app_bar.dart';
 import 'package:breadcrumbs/widgets/button/custom_button.dart';
@@ -20,6 +21,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("HOME REBUILD");
     return Scaffold(
       floatingActionButton: CustomFloatingButton(
         action2: () {
@@ -87,8 +89,10 @@ class HomeScreen extends StatelessWidget {
                           mainAxisSize: MainAxisSize.max,
                           children: [
                             GestureDetector(
-                              onTap: () {
-                                context.push(Routes.mascotRoute.mascotHome);
+                              onTap: () async {
+                                await context
+                                    .push(Routes.mascotRoute.mascotHome);
+                                _homeViewModel.changeState();
                               },
                               child: Container(
                                 decoration: BoxDecoration(
@@ -98,17 +102,27 @@ class HomeScreen extends StatelessWidget {
                                 ),
                                 width: chartWidth,
                                 height: chartWidth,
-                                child: RiveAnimation.asset(
-                                  // 'assets/rive/sparky_happy.riv',
+                                child: _homeViewModel.userMascotRepository
+                                            .selectedMascot ==
+                                        MascotEnum.chicken
+                                    ? const RiveAnimation.asset(
+                                        'assets/rive/chicken.riv',
+                                        fit: BoxFit.fitWidth,
+                                        alignment: Alignment.topRight,
+                                      )
+                                    : RiveAnimation.asset(
+                                        // 'assets/rive/sparky_happy.riv',
 
-                                  _homeViewModel.userMascot.health >= 80
-                                      ? 'assets/rive/sparky_happy.riv'
-                                      : _homeViewModel.userMascot.health <= 59
-                                          ? 'assets/rive/sparky_sad.riv'
-                                          : 'assets/rive/sparky_normal.riv',
-                                  fit: BoxFit.contain,
-                                  alignment: Alignment.topRight,
-                                ),
+                                        _homeViewModel.userMascot.health >= 80
+                                            ? 'assets/rive/sparky_happy.riv'
+                                            : _homeViewModel
+                                                        .userMascot.health <=
+                                                    59
+                                                ? 'assets/rive/sparky_sad.riv'
+                                                : 'assets/rive/sparky_normal.riv',
+                                        fit: BoxFit.contain,
+                                        alignment: Alignment.topRight,
+                                      ),
                               ),
                             ),
                           ],
@@ -209,6 +223,66 @@ class HomeScreen extends StatelessWidget {
                               ),
                               const Text(
                                 "Meals",
+                                style: TextStyle(color: Colors.black),
+                              )
+                            ],
+                          ),
+                          const SizedBox(
+                            width: 32,
+                          ),
+                          Column(
+                            spacing: 8.0,
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  context.push(
+                                      Routes.mealPlannerRoute.mealPlannerHome);
+                                },
+                                child: Container(
+                                  width: 45,
+                                  height: 45,
+                                  decoration: const BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(8))),
+                                  child: const Icon(
+                                    Icons.calendar_today_rounded,
+                                    color: Colors.orangeAccent,
+                                  ),
+                                ),
+                              ),
+                              const Text(
+                                "Meal Planner",
+                                style: TextStyle(color: Colors.black),
+                              )
+                            ],
+                          ),
+                          const SizedBox(
+                            width: 32,
+                          ),
+                          Column(
+                            spacing: 8.0,
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  context.push(Routes
+                                      .foodDatabaseRoute.foodDatabaseHome);
+                                },
+                                child: Container(
+                                  width: 45,
+                                  height: 45,
+                                  decoration: const BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(8))),
+                                  child: const Icon(
+                                    Icons.table_chart_rounded,
+                                    color: Colors.deepPurpleAccent,
+                                  ),
+                                ),
+                              ),
+                              const Text(
+                                "Food Database",
                                 style: TextStyle(color: Colors.black),
                               )
                             ],

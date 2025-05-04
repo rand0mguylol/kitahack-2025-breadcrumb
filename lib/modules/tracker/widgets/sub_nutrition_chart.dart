@@ -31,13 +31,13 @@ class SubNutritionChart extends StatelessWidget {
       children: [
         Text(
           subNutritionText,
-          style: TextStyle(color: Colors.black),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
-        ProgressBar(
-          progressValue: eatenPercentage,
-          height: 5,
-          color: color,
-        ),
+        // ProgressBar(
+        //   progressValue: eatenPercentage,
+        //   height: 5,
+        //   color: color,
+        // ),
         Text("${consumedAnount} / $subNutritionLimit $subNutritionUnit",
             style: TextStyle(color: Colors.black))
       ],

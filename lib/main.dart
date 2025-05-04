@@ -1,6 +1,7 @@
 import 'package:breadcrumbs/router/router.dart';
 import 'package:breadcrumbs/themes/app_theme.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'firebase_options.dart';
 import 'package:provider/provider.dart';
@@ -15,11 +16,19 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  await FirebaseAppCheck.instance.activate(
-    webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
-    androidProvider: AndroidProvider.playIntegrity,
-    appleProvider: AppleProvider.appAttest,
-  );
+  if (kDebugMode) {
+    await FirebaseAppCheck.instance.activate(
+      webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
+      androidProvider: AndroidProvider.debug,
+      // appleProvider: AppleProvider.debug,
+    );
+  } else {
+    await FirebaseAppCheck.instance.activate(
+      webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
+      androidProvider: AndroidProvider.playIntegrity,
+      // appleProvider: AppleProvider.debug,
+    );
+  }
 
   runApp(MultiProvider(
     providers: rootProviders(),

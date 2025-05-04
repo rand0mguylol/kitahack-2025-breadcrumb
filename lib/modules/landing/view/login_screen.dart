@@ -4,6 +4,7 @@ import 'package:breadcrumbs/modules/landing/view_model/login_view_model.dart';
 import 'package:breadcrumbs/widgets/app_bar/custom_app_bar.dart';
 import 'package:breadcrumbs/widgets/button/custom_button.dart';
 import 'package:breadcrumbs/utils/loading/loading.dart';
+import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart'; // new
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required LoginViewModel loginViewModel})

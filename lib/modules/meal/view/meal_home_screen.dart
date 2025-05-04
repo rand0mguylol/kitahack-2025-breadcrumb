@@ -4,6 +4,9 @@ import 'package:breadcrumbs/utils/loading/loading.dart';
 import 'package:breadcrumbs/widgets/app_bar/custom_app_bar.dart';
 import 'package:breadcrumbs/widgets/button/custom_button.dart';
 import 'package:flutter/material.dart';
+import 'package:breadcrumbs/widgets/date/scrollable_day_picker.dart';
+
+import 'package:intl/intl.dart';
 
 class MealHomeScreen extends StatelessWidget {
   MealHomeScreen({required MealHomeViewModel mealHomeViewModel})
@@ -14,8 +17,28 @@ class MealHomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: const CustomAppBar(
+        appBar: CustomAppBar(
           title: "Meals",
+          actions: [
+            InkWell(
+              onTap: () async {
+                final DateTime? pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: _mealHomeViewModel.date,
+                  firstDate: DateTime(2023),
+                  lastDate: DateTime(2026),
+                );
+
+                if (pickedDate != null) {
+                  _mealHomeViewModel.onChangeDate(pickedDate);
+                }
+              },
+              child: const Padding(
+                padding: EdgeInsets.only(right: 8.0),
+                child: Icon(Icons.calendar_month),
+              ),
+            )
+          ],
         ),
         body: SingleChildScrollView(
           child: LoadingScreen(
@@ -29,7 +52,7 @@ class MealHomeScreen extends StatelessWidget {
                     children: [
                       _buildDateSelection(context),
                       const SizedBox(
-                        height: 32,
+                        height: 24,
                       ),
                       _buildMealSection(context)
                     ],
@@ -43,48 +66,24 @@ class MealHomeScreen extends StatelessWidget {
 
   Widget _buildDateSelection(BuildContext context) {
     return Column(
-      spacing: 12.0,
+      spacing: 24.0,
       children: [
         Text(
-          "${_mealHomeViewModel.date.day}/${_mealHomeViewModel.date.month}/${_mealHomeViewModel.date.year}",
+          "${DateFormat('MMM').format(_mealHomeViewModel.date)} ${DateFormat('d').format(_mealHomeViewModel.date)}, ${_mealHomeViewModel.date.year}",
           style: const TextStyle(
               fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          spacing: 12.0,
-          children: [
-            Expanded(
-                child: CustomButton(
-              text: "Select Date",
-              textColor: Colors.black,
-              backgroundColor: Colors.white,
-              onPressed: () async {
-                final DateTime? pickedDate = await showDatePicker(
-                  context: context,
-                  initialDate: _mealHomeViewModel.date,
-                  firstDate: DateTime(2023),
-                  lastDate: DateTime(2026),
-                );
-
-                if (pickedDate != null) {
-                  _mealHomeViewModel.onChangeDate(pickedDate);
-                }
-              },
-            )),
-            // Expanded(child: CustomButton(text: "Search")),
-          ],
+        ResponsiveScrollableDayPicker(
+          selectedDate: _mealHomeViewModel.date,
+          onClickCallback: (DateTime date) {
+            _mealHomeViewModel.onChangeDate(date);
+          },
         )
       ],
     );
   }
 
   Widget _buildMealSection(BuildContext context) {
-    // return Column(
-    //   spacing: 16.0,
-    //   children: [_mealListTile(context)],
-    // );
-
     return ListView.separated(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),

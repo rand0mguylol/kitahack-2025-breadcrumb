@@ -25,6 +25,10 @@ dependencies:
   fl_chart: ^0.70.2
   rive: 0.13.14
   firebase_app_check: ^0.3.2+5
+  firebase_ui_auth: ^1.16.1
+  firebase_ui_oauth_google: ^1.4.1
+  flutter_markdown: ^0.7.7
+  syncfusion_flutter_charts: ^29.1.40
 
 dev_dependencies:
   flutter_test:
@@ -35,11 +39,10 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/financial_institution/
-    - assets/images/wallet/
-    - assets/images/onboarding/
-    - assets/WealthAI_icon.png
     - assets/images/meal/
     - assets/images/restaurant/
     - assets/images/brand/
     - assets/rive/
+    - assets/images/meal_planner/
+    - assets/images/food/
+    - assets/images/mascot/

@@ -1,11 +1,13 @@
 import 'package:breadcrumbs/models/goal/goal_model.dart';
 import 'package:breadcrumbs/models/goal/user_goal_model.dart';
 import 'package:breadcrumbs/models/mascot/user_mascot_model.dart';
+import 'package:breadcrumbs/models/user/user_detail_model.dart';
 import 'package:breadcrumbs/models/user/user_meal_model.dart';
 import 'package:breadcrumbs/repository/auth/auth_repository.dart';
 import 'package:breadcrumbs/repository/goal/goal_repository.dart';
 import 'package:breadcrumbs/repository/mascot/user_mascot_repository.dart';
 import 'package:breadcrumbs/repository/user/user_repository.dart';
+import 'package:breadcrumbs/services/user/user_detail_service_.dart';
 import 'package:breadcrumbs/utils/alert/alert.dart';
 import 'package:breadcrumbs/utils/error_handling/exception.dart';
 import 'package:breadcrumbs/utils/error_handling/result.dart';
@@ -18,7 +20,8 @@ class MascotHomeViewModel extends ChangeNotifier {
       {required this.goalRepository,
       required this.userAuthRepository,
       required this.userRepository,
-      required this.userMascotRepository}) {
+      required this.userMascotRepository,
+      required this.userDetailService}) {
     userMascot = userMascotRepository.userMascot!;
     initData();
   }
@@ -29,14 +32,36 @@ class MascotHomeViewModel extends ChangeNotifier {
   final UserAuthRepository userAuthRepository;
   final UserRepository userRepository;
   final UserMascotRepository userMascotRepository;
+  final UserDetailService userDetailService;
   late UserMascot userMascot;
+  MascotEnum mascotType = MascotEnum.sparky;
+
+  double bmi = 0;
+  double estimatedBmi = 0;
 
   bool isLoading = true;
   bool isError = false;
 
+  void setMascot(MascotEnum mascotEnum) async {
+    isLoading = true;
+    userMascotRepository.selectedMascot = mascotEnum;
+    mascotType = mascotEnum;
+    isLoading = false;
+    notifyListeners();
+  }
+
   Future<void> initData() async {
     User? user = userAuthRepository.user;
     String uid = user!.uid;
+    String email = user.email!;
+    print('EMAIL: $email');
+    UserDetail? userDetail = await userDetailService.getUserDetail(uid: uid);
+
+    if (userDetail != null) {
+      bmi = userDetail.weight! /
+          ((userDetail.height! / 100) * (userDetail.height! / 100));
+      estimatedBmi = email == 'waiiyuanchai21@gmail.com' ? 22 : bmi;
+    }
 
     userGoalsList = [];
     goalList = [];
@@ -44,9 +69,11 @@ class MascotHomeViewModel extends ChangeNotifier {
     Result<List<UserGoal>> result =
         await goalRepository.getAllUserGoalsList(uid: uid);
 
+    mascotType = userMascotRepository.selectedMascot;
+
     switch (result) {
       case Ok<List<UserGoal>>():
-        userGoalsList = result.value;
+        userGoalsList = [result.value.first];
 
       case Error<List<UserGoal>>():
         isLoading = false;
@@ -123,7 +150,7 @@ class MascotHomeViewModel extends ChangeNotifier {
         return;
     }
 
-    int newHealth = userMascot.health + g.point;
+    int newHealth = userMascot.health + 0;
     UserMascot updatedUserMascot = userMascot.copyWith(health: newHealth);
 
     Result<UserMascot> updateMascotResult = await userMascotRepository

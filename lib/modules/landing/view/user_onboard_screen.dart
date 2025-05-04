@@ -182,6 +182,17 @@ extension _UserOnboardView on _UserOnboardScreenState {
           height: 15,
         ),
         TextFormField(
+          validator: (String? value) {
+            if (value == null) {
+              return 'Please enter a valid value';
+            }
+
+            if (int.tryParse(value) == null) {
+              return 'Please enter a valid value';
+            }
+
+            return null;
+          },
           keyboardType: TextInputType.number, // Set the keyboard to numerical
           inputFormatters: [
             FilteringTextInputFormatter.digitsOnly, // Allow only digits
@@ -232,6 +243,17 @@ extension _UserOnboardView on _UserOnboardScreenState {
           // inputFormatters: [
           //   FilteringTextInputFormatter.digitsOnly, // Allow only digits
           // ],
+          validator: (String? value) {
+            if (value == null) {
+              return 'Please enter a valid value';
+            }
+
+            if (double.tryParse(value) == null) {
+              return 'Please enter a valid value';
+            }
+
+            return null;
+          },
           controller: _weightController,
           style: TextStyle(color: Colors.black),
           // validator: widget._registerViewModel.validateEmail,
@@ -251,7 +273,7 @@ extension _UserOnboardView on _UserOnboardScreenState {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          "Height (KG)",
+          "Height (CM)",
           style: TextStyle(color: Colors.black),
         ),
         const SizedBox(
@@ -262,6 +284,17 @@ extension _UserOnboardView on _UserOnboardScreenState {
           // inputFormatters: [
           //   FilteringTextInputFormatter.digitsOnly, // Allow only digits
           // ],
+          validator: (String? value) {
+            if (value == null) {
+              return 'Please enter a valid value';
+            }
+
+            if (double.tryParse(value) == null) {
+              return 'Please enter a valid value';
+            }
+
+            return null;
+          },
           controller: _heightController,
           style: TextStyle(color: Colors.black),
           // validator: widget._registerViewModel.validateEmail,

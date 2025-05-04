@@ -28,7 +28,7 @@ class NutritionChart extends StatelessWidget {
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
+      // mainAxisSize: MainAxisSize.min,
       spacing: 12,
       children: [
         SizedBox(

@@ -10,6 +10,7 @@ import 'package:breadcrumbs/services/goal/goal_service.dart';
 import 'package:breadcrumbs/services/goal/user_goal_service.dart';
 import 'package:breadcrumbs/utils/error_handling/result.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -34,10 +35,13 @@ class SplashScreenViewModel extends ChangeNotifier {
   bool status = false;
 
   Future<String> checkLoginStatus() async {
-    final user = _userAuthRepository.user;
+    // final user = _userAuthRepository.user;
+    final user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
       String uid = user.uid;
+
+      if (uid.isEmpty) return Routes.landing.landingScreen;
 
       bool? isOnboarded = await _checkOnboardingStatus(uid);
 
@@ -63,7 +67,8 @@ class SplashScreenViewModel extends ChangeNotifier {
   }
 
   Future<bool?> _checkOnboardingStatus(String uid) async {
-    final results = await userRepository.getUserDetail(uid: uid);
+    String inneruid = _userAuthRepository.getUserId();
+    final results = await userRepository.getUserDetail(uid: inneruid);
 
     switch (results) {
       case Ok<UserDetail?>():

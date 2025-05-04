@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:breadcrumbs/modules/food_capture/view_model/food_capture_preview_view_model.dart';
+import 'package:breadcrumbs/repository/auth/auth_repository.dart';
 import 'package:breadcrumbs/types/ingredient/ingredient.dart';
 import 'package:breadcrumbs/utils/loading/loading.dart';
 import 'package:breadcrumbs/widgets/app_bar/custom_app_bar.dart';
 import 'package:breadcrumbs/widgets/form/dropdown.dart';
 import 'package:breadcrumbs/widgets/form/text_form_field.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:breadcrumbs/constants/dropdown/form.dart';
 import 'package:provider/provider.dart';
@@ -11,10 +15,13 @@ import 'package:provider/provider.dart';
 class FoodCapturePreviewScreen extends StatefulWidget {
   const FoodCapturePreviewScreen(
       {super.key,
-      required FoodCapturePreviewViewModel foodCapturePreviewViewModel})
+      required FoodCapturePreviewViewModel foodCapturePreviewViewModel,
+      required this.userAuthRepository})
       : _foodCapturePreviewViewModel = foodCapturePreviewViewModel;
 
   final FoodCapturePreviewViewModel _foodCapturePreviewViewModel;
+  final UserAuthRepository userAuthRepository;
+  // final File file;
 
   @override
   State<FoodCapturePreviewScreen> createState() =>
@@ -26,9 +33,12 @@ class _FoodCapturePreviewScreenState extends State<FoodCapturePreviewScreen> {
   final TextEditingController _brandRestaurantNameController =
       TextEditingController();
 
+  late Future<File> filePath;
+
   @override
   void initState() {
     super.initState();
+    filePath = widget._foodCapturePreviewViewModel.getFilePath();
     _dishNameController.addListener(() {
       widget._foodCapturePreviewViewModel.setDishName(_dishNameController.text);
     });
@@ -47,63 +57,138 @@ class _FoodCapturePreviewScreenState extends State<FoodCapturePreviewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return LoadingScreen(
-      child: Scaffold(
-        appBar: CustomAppBar(
-          title: "Preview",
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 6),
-              child: GestureDetector(
-                  onTap: () async {
-                    final loadingProvider =
-                        Provider.of<LoadingProvider>(context, listen: false);
+    return FutureBuilder<File>(
+        future: filePath,
+        builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            // Show a loading indicator while the Future is loading
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            // Handle error state
+            return Center(child: Text('Something went wrong'));
+          }
+          return LoadingScreen(
+            child: Scaffold(
+              appBar: CustomAppBar(
+                title: "Preview",
+                actions: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: GestureDetector(
+                        onTap: () async {
+                          final loadingProvider = Provider.of<LoadingProvider>(
+                              context,
+                              listen: false);
 
-                    loadingProvider.showLoading();
-                    await widget._foodCapturePreviewViewModel
-                        .onValidateForm(context);
+                          loadingProvider.showLoading();
+                          await widget._foodCapturePreviewViewModel
+                              .onValidateForm(context);
 
-                    loadingProvider.hideLoading();
-                  },
-                  child: const Icon(Icons.smart_toy)),
-            )
-          ],
-        ),
-        body: Stack(
-          children: [
-            Expanded(
-              child: Image.file(
-                widget._foodCapturePreviewViewModel.file,
-                fit: BoxFit.cover,
-                width: double.infinity,
+                          loadingProvider.hideLoading();
+                        },
+                        child: const Icon(Icons.smart_toy)),
+                  )
+                ],
+              ),
+              body: Stack(
+                children: [
+                  Column(
+                    children: [
+                      Expanded(
+                        child: Image.file(
+                          snapshot.data!,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                        ),
+                      ),
+                    ],
+                  ),
+                  ListenableBuilder(
+                    listenable: widget._foodCapturePreviewViewModel,
+                    builder: (BuildContext context, _) {
+                      return DraggableScrollableSheet(
+                          initialChildSize: 0.5,
+                          minChildSize: 0.3,
+                          maxChildSize: 0.6,
+                          builder: (BuildContext context,
+                              ScrollController scrollController) {
+                            return SingleChildScrollView(
+                              controller: scrollController,
+                              child: Container(
+                                color: Colors.white,
+                                width: double.infinity,
+                                // height: double.maxFinite,
+                                padding: const EdgeInsets.all(16.0),
+                                child: _buildForm(context),
+                              ),
+                            );
+                          });
+                    },
+                  )
+                ],
               ),
             ),
-            ListenableBuilder(
-              listenable: widget._foodCapturePreviewViewModel,
-              builder: (BuildContext context, _) {
-                return DraggableScrollableSheet(
-                    initialChildSize: 0.5,
-                    minChildSize: 0.3,
-                    maxChildSize: 0.6,
-                    builder: (BuildContext context,
-                        ScrollController scrollController) {
-                      return SingleChildScrollView(
-                        controller: scrollController,
-                        child: Container(
-                          color: Colors.white,
-                          width: double.infinity,
-                          // height: double.maxFinite,
-                          padding: const EdgeInsets.all(16.0),
-                          child: _buildForm(context),
-                        ),
-                      );
-                    });
-              },
-            )
-          ],
-        ),
-      ),
-    );
+          );
+        }
+        // child: LoadingScreen(
+        //   child: Scaffold(
+        //     appBar: CustomAppBar(
+        //       title: "Preview",
+        //       actions: [
+        //         Padding(
+        //           padding: const EdgeInsets.only(right: 6),
+        //           child: GestureDetector(
+        //               onTap: () async {
+        //                 final loadingProvider =
+        //                     Provider.of<LoadingProvider>(context, listen: false);
+
+        //                 loadingProvider.showLoading();
+        //                 await widget._foodCapturePreviewViewModel
+        //                     .onValidateForm(context);
+
+        //                 loadingProvider.hideLoading();
+        //               },
+        //               child: const Icon(Icons.smart_toy)),
+        //         )
+        //       ],
+        //     ),
+        //     body: Stack(
+        //       children: [
+        //         Expanded(
+        //           child: Image.file(
+        //             widget._foodCapturePreviewViewModel.file,
+        //             fit: BoxFit.cover,
+        //             width: double.infinity,
+        //           ),
+        //         ),
+        //         ListenableBuilder(
+        //           listenable: widget._foodCapturePreviewViewModel,
+        //           builder: (BuildContext context, _) {
+        //             return DraggableScrollableSheet(
+        //                 initialChildSize: 0.5,
+        //                 minChildSize: 0.3,
+        //                 maxChildSize: 0.6,
+        //                 builder: (BuildContext context,
+        //                     ScrollController scrollController) {
+        //                   return SingleChildScrollView(
+        //                     controller: scrollController,
+        //                     child: Container(
+        //                       color: Colors.white,
+        //                       width: double.infinity,
+        //                       // height: double.maxFinite,
+        //                       padding: const EdgeInsets.all(16.0),
+        //                       child: _buildForm(context),
+        //                     ),
+        //                   );
+        //                 });
+        //           },
+        //         )
+        //       ],
+        //     ),
+        //   ),
+        // ),
+        );
   }
 
   Widget _buildForm(BuildContext context) {
@@ -121,6 +206,8 @@ class _FoodCapturePreviewScreenState extends State<FoodCapturePreviewScreen> {
   }
 
   List<Widget> _buildTopForm(BuildContext context) {
+    User? user = widget.userAuthRepository.user;
+    bool isWaiiYuan = user?.email == "waiiyuanchai21@gmail.com";
     return [
       const Text(
         "Details",
@@ -130,6 +217,7 @@ class _FoodCapturePreviewScreenState extends State<FoodCapturePreviewScreen> {
         height: 15,
       ),
       CustomTextFormField(
+          initialValue: isWaiiYuan ? 'Sausage Bun' : '',
           textEditingController: _dishNameController,
           validator: (String? value) {
             return widget._foodCapturePreviewViewModel
@@ -141,7 +229,9 @@ class _FoodCapturePreviewScreenState extends State<FoodCapturePreviewScreen> {
         height: 15,
       ),
       CustomDropdownMenu(
-          initialSelection: mealTypeEntries.first.value,
+          initialSelection: isWaiiYuan
+              ? mealTypeEntries[1].value
+              : mealTypeEntries.first.value,
           dropdownMenuEntries: mealTypeEntries,
           onSelected: (String? value) {
             widget._foodCapturePreviewViewModel.setMealType(value!);
@@ -151,7 +241,9 @@ class _FoodCapturePreviewScreenState extends State<FoodCapturePreviewScreen> {
         height: 15,
       ),
       CustomDropdownMenu(
-          initialSelection: portionSizeEntries.first.value,
+          initialSelection: isWaiiYuan
+              ? portionSizeEntries[3].value
+              : portionSizeEntries.first.value,
           dropdownMenuEntries: portionSizeEntries,
           onSelected: (String? value) {
             widget._foodCapturePreviewViewModel.setPortionSize(value!);
@@ -161,7 +253,9 @@ class _FoodCapturePreviewScreenState extends State<FoodCapturePreviewScreen> {
         height: 15,
       ),
       CustomDropdownMenu(
-          initialSelection: cookingMethodEntries.first.value,
+          initialSelection: isWaiiYuan
+              ? cookingMethodEntries[3].value
+              : cookingMethodEntries.first.value,
           dropdownMenuEntries: cookingMethodEntries,
           onSelected: (String? value) {
             widget._foodCapturePreviewViewModel.setCookingMethod(value!);

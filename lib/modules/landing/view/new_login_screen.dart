@@ -1,0 +1,66 @@
+import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart'; // new
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:breadcrumbs/router/routes.dart';
+
+class NewLoginScreen extends StatelessWidget {
+  const NewLoginScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return SignInScreen(
+            providers: [
+              EmailAuthProvider(),
+              GoogleProvider(
+                  clientId:
+                      "507069365405-cjp4elvpbehcfn55bkbklef0bdgv156i.apps.googleusercontent.com"), // new
+            ],
+            headerBuilder: (context, constraints, shrinkOffset) {
+              return const Padding(
+                padding: EdgeInsets.all(20),
+              );
+            },
+            subtitleBuilder: (context, action) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: action == AuthAction.signIn
+                    ? const Text('Welcome to Healthcrumb, please sign in!')
+                    : const Text('Welcome to Healthcrumb, please sign up!'),
+              );
+            },
+            footerBuilder: (context, action) {
+              return const Padding(
+                padding: EdgeInsets.only(top: 16),
+                child: Text(
+                  'By signing in, you agree to our terms and conditions.',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              );
+            },
+            sideBuilder: (context, shrinkOffset) {
+              return const Padding(
+                padding: EdgeInsets.all(20),
+              );
+            },
+          );
+        }
+
+        if (snapshot.data != null && snapshot.data?.uid != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            context.go(Routes.landing.splash);
+          });
+        }
+
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+  }
+}

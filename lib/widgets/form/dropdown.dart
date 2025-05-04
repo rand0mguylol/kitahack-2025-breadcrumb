@@ -17,6 +17,7 @@ class CustomDropdownMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     return DropdownMenu<String>(
       inputDecorationTheme: const InputDecorationTheme(
+          fillColor: Colors.white,
           enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(8.0)))),
       width: double.infinity,

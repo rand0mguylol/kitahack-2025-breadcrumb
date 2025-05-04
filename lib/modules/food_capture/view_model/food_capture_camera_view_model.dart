@@ -23,6 +23,8 @@ class FoodCaptureCameraViewModel extends ChangeNotifier {
       final File file = File(pictureFile.path);
       _cameraRepository.file = file;
 
+      await Future.delayed(const Duration(seconds: 5));
+
       if (context.mounted) {
         context.push(Routes.foodCapture.foodCapturePreview);
       }

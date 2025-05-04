@@ -26,7 +26,7 @@ class CaloriesChart extends StatelessWidget {
       width: 180,
       height: 180,
       child: CustomPieChart(
-        data: leftPercentage == 100
+        data: leftPercentage >= 100
             ? [
                 PieChartData(
                     Colors.grey.withValues(alpha: 0.15), leftPercentage),

@@ -1,5 +1,8 @@
+import 'package:breadcrumbs/constants/dropdown/form.dart';
+import 'package:breadcrumbs/router/routes.dart';
 import 'package:breadcrumbs/widgets/app_bar/custom_app_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 const LJ = [
   {
@@ -51,7 +54,7 @@ class _MarketplaceHomeScreenState extends State<MarketplaceHomeScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 1, vsync: this);
   }
 
   @override
@@ -62,6 +65,11 @@ class _MarketplaceHomeScreenState extends State<MarketplaceHomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
+
+    final double itemWidth = (size.width - 12 - 16) / 2;
+    final double itemHeight = itemWidth * 1.9;
+
     return Scaffold(
       appBar: const CustomAppBar(
         title: "Marketplace",
@@ -108,11 +116,11 @@ class _MarketplaceHomeScreenState extends State<MarketplaceHomeScreen>
                   ),
                   dividerHeight: 0,
                   tabs: const <Widget>[
+                    // Text(
+                    //   "Brands",
+                    // ),
                     Text(
-                      "Brands",
-                    ),
-                    Text(
-                      "Restaurant",
+                      "Food",
                     )
                   ],
                 ),
@@ -123,65 +131,45 @@ class _MarketplaceHomeScreenState extends State<MarketplaceHomeScreen>
             height: 16,
           ),
           Expanded(
-            // height: MediaQuery.of(context).size.height *,
             child: TabBarView(
               controller: _tabController,
               children: [
-                // Wrap(
-                //     alignment: WrapAlignment.center,
-                //     runSpacing: 12,
-                //     spacing: 24,
-                //     children: [_buildCard(context), _buildCard(context)]),
-                GridView.builder(
+                // GridView.count(
+                //   shrinkWrap: true,
+                //   padding:
+                //       const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                //   mainAxisSpacing: 12,
+                //   crossAxisSpacing: 16,
+                //   crossAxisCount: 2,
+                //   childAspectRatio: itemWidth / itemHeight,
+                //   children: nissin
+                //       .map((element) => _buildCard(
+                //             context,
+                //             name: element['name']!,
+                //             image: element['image']!,
+                //             calories: element['calories']!,
+                //             brand: 'Nissin',
+                //           ))
+                //       .toList(),
+                // ),
+
+                GridView.count(
+                  shrinkWrap: true,
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, // Number of columns
-                    crossAxisSpacing: 12, // Horizontal spacing between items
-                    mainAxisSpacing: 16, // Vertical spacing between items
-                    childAspectRatio: 0.6, // Width-to-height ratio of each item
-                  ),
-                  itemCount:
-                      nissin.length, // Replace with the actual number of items
-                  itemBuilder: (context, index) {
-                    final item = nissin[index];
-                    return _buildCard(
-                      context,
-                      name: item['name']!,
-                      image: item['image']!,
-                      calories: item['calories']!,
-                      brand: 'Nissin',
-                    ); // Build each card
-                  },
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 16,
+                  crossAxisCount: 2,
+                  childAspectRatio: itemWidth / itemHeight,
+                  children: LJList.map((element) => _buildCard(
+                        context,
+                        id: element['id'],
+                        name: (element['title']) ?? '',
+                        image: element['image'] ?? '',
+                        calories: element['nutrition']['calories'].toString(),
+                        brand: 'La Juceria',
+                      )).toList(),
                 ),
-                GridView.builder(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, // Number of columns
-                    crossAxisSpacing: 12, // Horizontal spacing between items
-                    mainAxisSpacing: 16, // Vertical spacing between items
-                    childAspectRatio: 0.6, // Width-to-height ratio of each item
-                  ),
-                  itemCount:
-                      LJ.length, // Replace with the actual number of items
-                  itemBuilder: (context, index) {
-                    final item = LJ[index];
-                    return _buildCard(
-                      context,
-                      name: item['name']!,
-                      image: item['image']!,
-                      calories: item['calories']!,
-                      brand: 'La Juceria',
-                    ); // Build each card
-                  },
-                )
-                // const Center(
-                //   child: Text(
-                //     "Feature is coming soon",
-                //     style: TextStyle(color: Colors.black),
-                //   ),
-                // )
               ],
             ),
           ),
@@ -191,73 +179,85 @@ class _MarketplaceHomeScreenState extends State<MarketplaceHomeScreen>
   }
 
   Widget _buildCard(BuildContext context,
-      {String image = 'assets/images/meal/phone_1.png',
+      {required String id,
+      String image = 'assets/images/meal/phone_1.png',
       String name = "Spicy Chicken Mcdeluxe",
       String calories = "1000",
       String brand = 'Mcdonald'}) {
-    return Container(
-      clipBehavior: Clip.antiAlias,
-      width: 166,
-      height: 280,
-      decoration: BoxDecoration(
-          color: Colors.white, borderRadius: BorderRadius.circular(8)),
-      child: Column(
-        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: double.infinity,
-            height: 166,
-            child: ClipRRect(
-              clipBehavior: Clip.hardEdge,
-              child: Image.asset(
-                image,
-                // 'assets/images/meal/phone_1.png',
-                fit: BoxFit.fitWidth,
+    return GestureDetector(
+      onTap: () {
+        context.push(Routes.marketplaceRoute.marketplaceDetail(foodId: id));
+      },
+      child: Container(
+        clipBehavior: Clip.antiAlias,
+        width: 166,
+        decoration: BoxDecoration(
+            color: Colors.white, borderRadius: BorderRadius.circular(8)),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            LayoutBuilder(
+              builder: (builder, constraints) {
+                final width = constraints.maxWidth;
+                return SizedBox(
+                  child: ClipRRect(
+                    clipBehavior: Clip.hardEdge,
+                    child: Image.asset(
+                      image,
+                      fit: BoxFit.cover,
+                      width: width,
+                      height: width,
+                      // he
+                    ),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 16.0),
+              child: Text(
+                name,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
             ),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0),
-            child: Text(
-              name,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.black,
-                fontWeight: FontWeight.w900,
+            const SizedBox(
+              height: 10,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 16.0),
+              child: Text(
+                brand,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Colors.grey,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
             ),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0),
-            child: Text(
-              brand,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: Colors.grey,
-                fontWeight: FontWeight.w900,
-              ),
+            const SizedBox(
+              height: 10,
             ),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0),
-            child: Text("$calories kcal",
-                style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.black,
-                    fontStyle: FontStyle.italic)),
-          )
-        ],
+            Padding(
+              padding: const EdgeInsets.only(left: 16.0, bottom: 16),
+              child: Text("$calories kcal",
+                  style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.black,
+                      fontStyle: FontStyle.italic)),
+            )
+          ],
+        ),
       ),
     );
   }

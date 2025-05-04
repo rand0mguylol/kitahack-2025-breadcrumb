@@ -2,18 +2,22 @@ import 'package:breadcrumbs/repository/analyse/analyse_repository.dart';
 import 'package:breadcrumbs/repository/camera/camera_repository.dart';
 import 'package:breadcrumbs/repository/firebase_function/firebase_function_repository.dart';
 import 'package:breadcrumbs/repository/firebase_storage/firebase_storage_repository.dart';
+import 'package:breadcrumbs/repository/food_database/food_database_repository.dart';
 import 'package:breadcrumbs/repository/goal/goal_repository.dart';
 import 'package:breadcrumbs/repository/group/group_repository.dart';
 import 'package:breadcrumbs/repository/mascot/user_mascot_repository.dart';
+import 'package:breadcrumbs/repository/meal_planner/meal_planner_repository.dart';
 import 'package:breadcrumbs/repository/user/user_repository.dart';
 import 'package:breadcrumbs/services/auth/auth_service.dart';
 import 'package:breadcrumbs/repository/auth/auth_repository.dart';
 import 'package:breadcrumbs/services/firebase_function/firebase_function_service.dart';
 import 'package:breadcrumbs/services/firebase_storage/firebase_storage_service.dart';
+import 'package:breadcrumbs/services/food_database/food_database_service.dart';
 import 'package:breadcrumbs/services/goal/goal_service.dart';
 import 'package:breadcrumbs/services/goal/user_goal_service.dart';
 import 'package:breadcrumbs/services/group/group_service.dart';
 import 'package:breadcrumbs/services/mascot/user_mascot_service.dart';
+import 'package:breadcrumbs/services/meal_planner/meal_planner_service.dart';
 import 'package:breadcrumbs/services/user/user_detail_service_.dart';
 import 'package:breadcrumbs/services/user/user_meal_service.dart';
 import 'package:breadcrumbs/services/user/user_nutrition_service.dart';
@@ -32,6 +36,8 @@ List<SingleChildWidget> rootProviders() => [
       ...userGoalProviders,
       ...userMascotProviders,
       ...groupProviders,
+      ...mealPlannerProviders,
+      ...foodDatabaseService
     ];
 
 List<SingleChildWidget> userProviders = [
@@ -114,4 +120,14 @@ List<SingleChildWidget> userMascotProviders = [
 List<SingleChildWidget> groupProviders = [
   Provider(create: (context) => GroupService()),
   Provider(create: (context) => GroupRepository(groupService: context.read()))
+];
+
+List<SingleChildWidget> mealPlannerProviders = [
+  Provider(create: (context) => MealPlannerService()),
+  Provider(create: (context) => MealPlannerRepository())
+];
+
+List<SingleChildWidget> foodDatabaseService = [
+  Provider(create: (context) => FoodDatabaseService()),
+  Provider(create: (context) => FoodDatabaseRepository())
 ];

@@ -61,6 +61,10 @@ class FoodCapturePreviewViewModel extends ChangeNotifier {
 
   final formKey = GlobalKey<FormState>();
 
+  Future<File> getFilePath() async {
+    return _cameraRepository.file;
+  }
+
   void setDishName(String value) {
     dishName = value;
   }
@@ -138,7 +142,7 @@ class FoodCapturePreviewViewModel extends ChangeNotifier {
 
   Future<void> onValidateForm(BuildContext context) async {
     if (!formKey.currentState!.validate()) {
-      for (IngredientFieldData i in _ingredientFieldData) {}
+      // for (IngredientFieldData i in _ingredientFieldData) {}
       return;
     }
     final alert = Alert.of(context);
@@ -170,6 +174,26 @@ class FoodCapturePreviewViewModel extends ChangeNotifier {
 
     final result = await _firebaseFunctionRepository.analyseFood(
         analyseFoodRequest: analyzeFoodRequest);
+
+    // final combineResults = await Future.wait([
+    //   _uploadFoodPicture(),
+    //   _firebaseFunctionRepository.analyseFood(
+    //       analyseFoodRequest: analyzeFoodRequest)
+    // ]);
+
+    // // Extract results
+    // final Map<String, String> uploadResult =
+    //     combineResults[0] as Map<String, String>;
+    // final Result<AnalyseFoodResponse<Nutrition>> analyseFoodResult =
+    //     combineResults[1] as Result<AnalyseFoodResponse<Nutrition>>;
+
+    // if (uploadResult.isEmpty) {
+    //   alert.showError("Failed to upload the picture.");
+    //   return;
+    // }
+
+    // String url = uploadResult["url"]!;
+    // String path = uploadResult['path']!;
 
     switch (result) {
       case Error<AnalyseFoodResponse<Nutrition>>():

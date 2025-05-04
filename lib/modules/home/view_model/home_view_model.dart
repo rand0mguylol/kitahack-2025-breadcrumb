@@ -37,6 +37,7 @@ class HomeViewModel extends ChangeNotifier {
   final UserRepository _userRepository;
   final UserAuthRepository _userAuthRepository;
   final UserMascotRepository userMascotRepository;
+  MascotEnum mascotType = MascotEnum.sparky;
 
   bool isLoading = true;
   bool isError = false;
@@ -62,6 +63,10 @@ class HomeViewModel extends ChangeNotifier {
   late double _progressValue;
   double get progressValue => _progressValue;
 
+  void changeState() {
+    notifyListeners();
+  }
+
   void _init() async {
     // Await both futures to complete using future.wait
     try {
@@ -82,6 +87,9 @@ class HomeViewModel extends ChangeNotifier {
       _progressValue = (_caloriesEaten / (_userDetail?.nutrition?.calories)!);
 
       isLoading = false;
+
+      mascotType = userMascotRepository.selectedMascot;
+      print("MASCOT TYPE HOME: ${mascotType}");
 
       displayName = _userDetail!.displayName!;
 
@@ -134,19 +142,19 @@ class HomeViewModel extends ChangeNotifier {
     nutritionSnippet = [
       NutritionSnippet(
           text: 'Fats',
-          value: _userNutrition!.nutrition!.fats!.toString(),
+          value: _userNutrition!.nutrition!.fats!.toStringAsFixed(2),
           unit: 'g'),
       NutritionSnippet(
           text: 'Proteins',
-          value: _userNutrition!.nutrition!.proteins!.toString(),
+          value: _userNutrition!.nutrition!.proteins!.toStringAsFixed(2),
           unit: 'g'),
       NutritionSnippet(
           text: 'Carbs',
-          value: _userNutrition!.nutrition!.carbohydrates!.toString(),
+          value: _userNutrition!.nutrition!.carbohydrates!.toStringAsFixed(2),
           unit: 'g'),
       NutritionSnippet(
           text: 'Sugar',
-          value: _userNutrition!.nutrition!.sugars!.toString(),
+          value: _userNutrition!.nutrition!.sugars!.toStringAsFixed(2),
           unit: 'g'),
     ];
   }

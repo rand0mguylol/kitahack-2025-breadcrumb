@@ -2,6 +2,7 @@ import 'package:breadcrumbs/modules/landing/view/login_screen.dart';
 import 'package:breadcrumbs/modules/landing/view/register_screen.dart';
 import 'package:breadcrumbs/modules/landing/view_model/login_view_model.dart';
 import 'package:breadcrumbs/router/routes.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -83,25 +84,28 @@ class LandingScreen extends StatelessWidget {
         SizedBox(
           width: double.infinity,
           child: CustomButton(
-            text: "Login",
+            text: "Get Started",
             backgroundColor: const Color.fromRGBO(28, 28, 30, 1),
-            onPressed: () {
-              context.go(Routes.landing.login);
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              if (context.mounted) {
+                context.go(Routes.landing.newLogin);
+              }
             },
           ),
         ),
         const SizedBox(
           height: 12,
         ),
-        SizedBox(
-          width: double.infinity,
-          child: CustomButton(
-            text: "Register",
-            onPressed: () {
-              context.go(Routes.landing.register);
-            },
-          ),
-        ),
+        // SizedBox(
+        //   width: double.infinity,
+        //   child: CustomButton(
+        //     text: "Register",
+        //     onPressed: () {
+        //       context.go(Routes.landing.register);
+        //     },
+        //   ),
+        // ),
       ],
     );
   }

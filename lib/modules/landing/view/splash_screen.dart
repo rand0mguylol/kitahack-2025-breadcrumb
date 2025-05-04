@@ -51,10 +51,13 @@ class _SplashScreenState extends State<SplashScreen> {
                 }
               }
               return const Center(
-                child: Text(
-                  "Splash Screen",
-                  style: TextStyle(color: Colors.black),
+                child: CircularProgressIndicator(
+                  color: Colors.orangeAccent,
                 ),
+                // child: Text(
+                //   "Starting...",
+                //   style: TextStyle(color: Colors.black),
+                // ),
               );
             }));
   }
